@@ -156,6 +156,8 @@ bool process_flags(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     if (!process_flags(argc, argv))
         return 0;
+    Aux::init(); // инициализация глобальных констант
+
     auto list_error = get_list_errors();
     if (ignore_error_pkgs)
         list_error.clear();
@@ -173,6 +175,9 @@ int main(int argc, char *argv[]) {
     set<std::string> test;
     int index = 0;
     for (auto it = t.begin(); it != t.end(); it++) {
+        if (*it == "boost") {
+            std::cout << "boost " << packageExamined(*it, pack_regexs, list_error) << "\n";
+        }
         if (!packageExamined(*it, pack_regexs, list_error)) {
             continue;
         }
@@ -183,11 +188,13 @@ int main(int argc, char *argv[]) {
    
     test = check_error(test, list_error);
 
+    std::cout << "analysingBranchPackages   " << test.size() << " " << *(test.begin()) << std::endl;
     L.analysingBranchPackages(test);
  
 
     std::vector<std::string> packages;
     std::map<std::string, std::pair<std::string, std::string>> test_pack;
+    std::cout << "packagesToAnalyse " << L.packagesToAnalyse.size() << std::endl;
     for(auto pack: L.packagesToAnalyse) {
         cout << pack.second.first << endl;
         packages.push_back(pack.second.first);
@@ -203,10 +210,14 @@ int main(int argc, char *argv[]) {
     std::cout << L.packagesToAnalyse.size() << std::endl;
 
     auto P = PatchMaker();
-    P.packagesToPatch = packages;
     P.dependenciesToDelete = L.criteriaChecking(CH);
+    P.packagesToPatch = L.packagesToFix;
+    cout << "L.pakagesToFix.size(): " << L.packagesToFix.size();
+    for (int i = 0; i < L.packagesToFix.size(); i++) {
+        cout << L.packagesToFix[i] << std::endl;
+    }
     P.loadSpecs(PatchMaker::specLoader::apiLoader);
-    P.makePatch("./Patches3/");
+    P.makePatch("./Patches3_TEST/");
 
     return 0;
 }

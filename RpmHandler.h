@@ -11,6 +11,7 @@
 #include <rpm/header.h>
 #include <rpm/rpmdb.h>
 #include <curl/curl.h>
+#include "Aux.h"
 
 // структура зависимость
 // dependencyName - название зависимости
@@ -59,6 +60,12 @@ public:
     // возвращает множество пакетов по названию классик файла
     std::set<std::string> static getPackageFromClassicFileName(std::string folder, std::string branch, 
                                                                std::string classicName, std::string arch);
+
+    // возвращает все провайдсы из старых веток (classicArches)
+    std::set<std::string> static getAllProvides(std::string folder, std::string branch, 
+                                                   std::string classicName, std::string arch);
+
+    std::map<std::string, std::set<std::string>> static packagesProvides();
 private:
     // возвращает файловый дескриптор
     FD_t static getCalssicFileDescriptor(std::string fileName);

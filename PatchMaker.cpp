@@ -1,4 +1,4 @@
-﻿#include "PatchMaker.h"
+#include "PatchMaker.h"
 
 // Загрузка спеков из api, или из git
 void PatchMaker::loadSpecs(specLoader sl) {
@@ -76,8 +76,9 @@ void PatchMaker::makePatch(std::string patch_destination) {
 	for (int i = 0; i < packagesToPatch.size(); i++) {
         std::cout << "Patching package " + packagesToPatch[i] << "\n";
         std::ofstream spec;
+
         spec.open(packagesToPatch[i] + "~.spec");
-		spec << specs[packagesToPatch[i]];
+		    spec << specs[packagesToPatch[i]];
 
         std::ofstream patched;
         patched.open(packagesToPatch[i] + ".spec");
@@ -94,7 +95,9 @@ void PatchMaker::makePatch(std::string patch_destination) {
         if (patched_str != specs[packagesToPatch[i]]) {
             spec.close();
             patched.close();
+          
             std::cout << "diff -Naru " + packagesToPatch[i] + ".spec~ " + packagesToPatch[i] + ".spec > " + patch_destination + packagesToPatch[i] + ".patch" << std::endl;
+
             int resp = system(("diff -Naru Specfile.spec PatchedSpecfile.spec > " + patch_destination + packagesToPatch[i] + ".patch").c_str());
             if (resp != 0) {
                 std::cout << "Error while making patch for " << packagesToPatch[i] << ": " << resp << std::endl;
