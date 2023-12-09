@@ -194,7 +194,7 @@ std::set<std::string> RpmHandler::getPackageFromClassicFileName(std::string fold
         }
         else {
             // auto source_name = ReplaceAll(std::string(str_name), std::string("-")+str_version+"-"+str_release+".src.rpm", "");
-            std::cout << str_name << std::endl;
+            // std::cout << str_name << std::endl;
             out.insert(ReplaceAll(std::string(str_name), "+", "%2B"));
             free(str_name);
             free(str_release);
