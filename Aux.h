@@ -42,7 +42,7 @@ namespace Aux {
     inline std::string exec(const char* cmd) {
         std::array<char, 128> buffer;
         std::string result;
-        std::cout << "RUN CMD: " << cmd << std::endl;
+        // std::cout << "RUN CMD: " << cmd << std::endl;
         std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
         if (!pipe) {
             throw std::runtime_error("popen() failed!");

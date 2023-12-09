@@ -34,6 +34,7 @@ std::map<std::string, std::pair<std::string, std::string>> RpmHandler::getAllPac
     std::string src_name = "%{SOURCERPM}";
     std::string release = "%{RELEASE}";
     std::string version = "%{VERSION}";
+    StatusBar status_get_pack("Получение списка пакетов для анализа", 1.0 / float(classicArches.size()));
     // зашрузка classic файлов для branch если файлы отсутствуют
     for (auto arch: classicArches)
     {
@@ -47,6 +48,7 @@ std::map<std::string, std::pair<std::string, std::string>> RpmHandler::getAllPac
     
 
     for (auto arch: classicArches) {
+        status_get_pack.print_status("Анализ " + arch);
         std::string pkglist = constNameClassic + arch;
         
         FD_t Fd = getCalssicFileDescriptor(pkglist);
@@ -85,7 +87,7 @@ std::map<std::string, std::pair<std::string, std::string>> RpmHandler::getAllPac
         
         Fclose(Fd);
     }
-
+    status_get_pack.end_status();
     return srcNameToPackName;
 }
 

@@ -12,6 +12,7 @@
 #include <rpm/rpmdb.h>
 #include <curl/curl.h>
 #include "Aux.h"
+#include "StatusBar.h"
 
 // структура зависимость
 // dependencyName - название зависимости

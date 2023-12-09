@@ -10,6 +10,7 @@
 #include "Config.h"
 #include <htmlcxx/html/ParserDom.h>
 #include <curl/curl.h>
+#include "StatusBar.h"
 
 using namespace std;
 using namespace htmlcxx;
@@ -28,13 +29,13 @@ bool packageExamined(std::string pack, const std::vector<std::string>& pack_rege
         std::regex R(r);
         std::smatch cm;
         if (std::regex_search(pack, cm, R)) {
-            for (auto err: list_errors) {
-                std::regex R(pack + string(".*"));
-                std::smatch cm;
-                if (std::regex_search(err, cm, R)) {
-                    cout << "WARNING! " << pack << endl;
-                }
-            }
+            // for (auto err: list_errors) {
+            //     std::regex R(pack + string(".*"));
+            //     std::smatch cm;
+            //     if (std::regex_search(err, cm, R)) {
+            //         cout << "WARNING! " << pack << endl;
+            //     }
+            // }
 
             return true;
         }
@@ -75,9 +76,9 @@ std::set<std::string> check_error(std::set<std::string> packs, std::vector<std::
         }   
     }
 
-    if (ask_user(err_l)) {
-        return not_err;
-    }
+    // if (ask_user(err_l)) {
+    //     return not_err;
+    // }
     return packs;
 }
 
@@ -156,17 +157,23 @@ bool process_flags(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     if (!process_flags(argc, argv))
         return 0;
+    
+    Config conf;
+    StatusBar::is_quiet = conf.getIsQuiet();
+    postgreConnStr = conf.getConnectDB();
+    auto pack_regexs = conf.getPackRegexs();
+
+    if (!StatusBar::is_quiet)
+        std::cout << "Получение актуальной информации по текущей ветке\n";
+        
     Aux::init(); // инициализация глобальных констант
 
     auto list_error = get_list_errors();
     if (ignore_error_pkgs)
         list_error.clear();
-    // return 0;
-    Config cf;
-    postgreConnStr = cf.getConnectDB();
-    auto pack_regexs = cf.getPackRegexs();
 
-    std::cout << postgreConnStr << std::endl;
+    
+
     Cacher CH;
 
     auto  L = LegacyDependencyAnalyzer();
@@ -174,10 +181,10 @@ int main(int argc, char *argv[]) {
     auto t = Api::getBranchPackageNames("sisyphus");
     set<std::string> test;
     int index = 0;
+    StatusBar get_user_pack("Отбор пакетов для анализа", 1.0 / float(t.size()));
+    get_user_pack.print_status();
     for (auto it = t.begin(); it != t.end(); it++) {
-        if (*it == "boost") {
-            std::cout << "boost " << packageExamined(*it, pack_regexs, list_error) << "\n";
-        }
+        get_user_pack.print_status(*it);
         if (!packageExamined(*it, pack_regexs, list_error)) {
             continue;
         }
@@ -185,18 +192,18 @@ int main(int argc, char *argv[]) {
         test.insert(*it);
         index++;
     }
+    get_user_pack.end_status();
    
     test = check_error(test, list_error);
 
-    std::cout << "analysingBranchPackages   " << test.size() << " " << *(test.begin()) << std::endl;
+    // std::cout << "analysingBranchPackages   " << test.size() << " " << *(test.begin()) << std::endl;
     L.analysingBranchPackages(test);
  
 
     std::vector<std::string> packages;
     std::map<std::string, std::pair<std::string, std::string>> test_pack;
-    std::cout << "packagesToAnalyse " << L.packagesToAnalyse.size() << std::endl;
     for(auto pack: L.packagesToAnalyse) {
-        cout << pack.second.first << endl;
+        // cout << pack.second.first << endl;
         packages.push_back(pack.second.first);
         test_pack[pack.first] = pack.second;
         // if (count <= 0) {
@@ -207,17 +214,16 @@ int main(int argc, char *argv[]) {
     }
 
     L.packagesToAnalyse = test_pack;
-    std::cout << L.packagesToAnalyse.size() << std::endl;
 
     auto P = PatchMaker();
     P.dependenciesToDelete = L.criteriaChecking(CH);
     P.packagesToPatch = L.packagesToFix;
-    cout << "L.pakagesToFix.size(): " << L.packagesToFix.size();
-    for (int i = 0; i < L.packagesToFix.size(); i++) {
-        cout << L.packagesToFix[i] << std::endl;
-    }
+    // cout << "L.pakagesToFix.size(): " << L.packagesToFix.size() << std::endl;
+    // for (int i = 0; i < L.packagesToFix.size(); i++) {
+    //     cout << L.packagesToFix[i] << std::endl;
+    // }
     P.loadSpecs(PatchMaker::specLoader::apiLoader);
-    P.makePatch("./Patches3_TEST/");
+    P.makePatch(conf.getPatchDestination());
 
     return 0;
 }

@@ -11,6 +11,7 @@
 #include "RpmHandler.h"
 #include "Api.h"
 #include "WDS.h"
+#include "StatusBar.h"
 
 
 

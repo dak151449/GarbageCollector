@@ -16,6 +16,7 @@
 #include <fstream>
 #include "RpmHandler.h"
 #include "Api.h"
+#include "StatusBar.h"
 
 class PatchMaker {
 public:

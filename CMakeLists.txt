@@ -39,6 +39,7 @@ add_executable(GarbageCollector
         "Config.h" "Config.cpp"
         "Aux.h"
         "WDS.h" "WDS.cpp"
+        "StatusBar.h" "StatusBar.cpp"
          )
 
 include_directories(${JSONCPP_INCLUDE_DIR})
