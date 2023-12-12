@@ -2,16 +2,16 @@
 
 patch_commiter='PatchCommitter.sh'
 tar_name='patches.tar.gz'
-config='./config.json'
+config='config.json'
 
 patch_destination=$(grep -o '"patch_destination": "[^"]*' $config | grep -o '[^"]*$')
 
 function gen {
-    wait $(./GarbageCollector)
+    ./GarbageCollector
 }
 
 function make_tar {
-    wait $(gen)
+    gen
     cp $patch_commiter $patch_destination
     tar -czvf $tar_name $patch_destination
     mv $tar_name $destination
@@ -25,7 +25,7 @@ function apply_tar {
 }
 
 function gen_and_run {
-    wait $(gen)
+    gen
     cp $patch_commiter $patch_destination
     pushd $patch_destination
     sh $patch_commiter
@@ -33,7 +33,7 @@ function gen_and_run {
 }
 
 function set_regex {
-    sed -i '/^    "pack_regexs":/c\    "pack_regexs": ['"$regex"'],' $config
+    sed -i '/^    "pack_regexs":/c\    "pack_regexs": ['"\"$regex\""'],' $config
 }
 
 function set_verbose {
@@ -51,7 +51,7 @@ function help {
    echo "Usage: $(basename \$0) [-c] [-t tar_destination] [-r] [-a tar_path] [-s regex] [-q] [-h]"
    echo "options:"
    echo "c     Open and edit config."
-   echo "t     Generates patches to destionation."
+   echo "t     Generates patches to destination."
    echo "r     Generates and applies patch."
    echo "a     Applies patch from tar."
    echo "s     Set regex for packages with delemeter ','."
@@ -64,14 +64,14 @@ rm -rf $patch_destination
 mkdir $patch_destination
 set_verbose
 
-while getopts 'ctrasqh:' OPTION; do
+while getopts 'ct:ra:s:qh' OPTION; do
   case "$OPTION" in
     c)
-      vim $config
+      vi $config
       ;;
     t)
-      destination="$OPTARG"
-      echo "Generating patches.tar.gz to $OPTARG"
+      destination="${OPTARG}"
+      echo "Generating patches.tar.gz to $destination"
       make_tar
       ;;
     r)
@@ -79,12 +79,12 @@ while getopts 'ctrasqh:' OPTION; do
       gen_and_run
       ;;
     a)
-      tar_path="$OPTARG"
-      echo "Applying patches from $OPTARG"
+      tar_path="${OPTARG}"
+      echo "Applying patches from $tar_path"
       apply_tar
       ;;
     s)
-      regex="$OPTARG"
+      regex="${OPTARG}"
       set_regex
       ;;
     q)

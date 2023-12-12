@@ -1,8 +1,18 @@
+#define CACHE_OFF
 #include "PostgreHandler.h"
 
 extern std::string postgreConnStr;
 
+#ifdef CACHE_OFF
+PostgreHandler::PostgreHandler() {}
+void PostgreHandler::reconnect() {}
+bool PostgreHandler::addDeprecated(std::string name, bool data) { return true; }
+std::optional<bool> PostgreHandler::getDeprecated(std::string name) { return std::nullopt; }
+#elif
 PostgreHandler::PostgreHandler(): connect(pqxx::connection(postgreConnStr)) {
+    #ifdef CACHE_OFF
+    return;
+    #endif
     table_name = "packages_what_dep_src_TEST";
     pqxx::work W(connect);
     W.exec("CREATE TABLE IF NOT EXISTS " + table_name + " (name TEXT PRIMARY KEY, \"what_src\" boolean)");
@@ -10,6 +20,9 @@ PostgreHandler::PostgreHandler(): connect(pqxx::connection(postgreConnStr)) {
 }
 
 void PostgreHandler::reconnect() {
+    #ifdef CACHE_OFF
+    return;
+    #endif
     std::cerr << "Connection lost, trying to reconnect..." << std::endl;
     int times = 0;
     try {
@@ -57,3 +70,4 @@ std::optional<bool> PostgreHandler::getDeprecated(std::string name) {
     
     return std::nullopt;
 }
+#endif

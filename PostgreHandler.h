@@ -1,3 +1,4 @@
+#define CACHE_OFF
 #pragma once
 #include <iostream>
 #include <string>
@@ -14,7 +15,6 @@ class PostgreHandler {
 public:
     std::mutex ph_lock;
     int test = 0;
-    pqxx::connection connect;
 	PostgreHandler();
     void reconnect();
     
@@ -25,6 +25,7 @@ public:
     std::optional<bool> getDeprecated(std::string name);
 private:
     std::string table_name;
+    #ifndef CACHE_OFF
+    pqxx::connection connect;
+    #endif
 };
-
-
