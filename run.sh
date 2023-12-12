@@ -2,16 +2,16 @@
 
 patch_commiter='PatchCommitter.sh'
 tar_name='patches.tar.gz'
-config='config.json'
+config='./config.json'
 
 patch_destination=$(grep -o '"patch_destination": "[^"]*' $config | grep -o '[^"]*$')
 
 function gen {
-    ./GarbageCollector
+    wait $(./GarbageCollector)
 }
 
 function make_tar {
-    gen
+    wait $(gen)
     cp $patch_commiter $patch_destination
     tar -czvf $tar_name $patch_destination
     mv $tar_name $destination
@@ -25,7 +25,7 @@ function apply_tar {
 }
 
 function gen_and_run {
-    gen
+    wait $(gen)
     cp $patch_commiter $patch_destination
     pushd $patch_destination
     sh $patch_commiter
