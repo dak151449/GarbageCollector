@@ -20,7 +20,7 @@ std::map<std::string,std::vector<Dependency>> LegacyDependencyAnalyzer::criteria
 
     std::set<std::string> fix;
 
-    StatusBar status_dep_pack("Анализ зависимостей в пакетах", 1.0 / float(packDependencies.size()));
+    StatusBar status_dep_pack("Анализ зависимостей в пакетах", float(packDependencies.size()));
     status_dep_pack.print_status();
     for (auto pack: packDependencies) {
         status_dep_pack.print_status(pack.packageName);
@@ -70,13 +70,16 @@ std::map<std::string,std::vector<Dependency>> LegacyDependencyAnalyzer::criteria
 std::set<std::string> LegacyDependencyAnalyzer::getOldPackagesNames()
 {   
     std::set<std::string> oldPackages;
+    StatusBar downloading_classic_files_status("Загрузка classic файлов", float(oldBranches.size() * classicArches.size()));
     for (auto br: oldBranches)
     {
         for(auto arch: classicArches) {
+            downloading_classic_files_status.print_status(br + "-" + arch);
             auto getPack = RpmHandler::getPackageFromClassicFileName(folderClassicFiles, br, constNameClassic, arch);
             oldPackages.insert(getPack.begin(), getPack.end());
         }
     }
+    downloading_classic_files_status.end_status();
 
     for (auto name: packagesToAnalyse) {
         oldPackages.erase(name.first);
@@ -89,7 +92,7 @@ std::set<std::string> LegacyDependencyAnalyzer::getOldPackagesNames()
 std::set<std::string> LegacyDependencyAnalyzer::getOldProvides()
 {   
     auto dep =  RpmHandler::getDependenciesForPackages(packagesToAnalyse);
-    StatusBar status_get_old_provides("Поиск provides, которые есть в старых ветках", 1.0 / float(oldBranches.size() + 1));
+    StatusBar status_get_old_provides("Поиск provides, которые есть в старых ветках", float(oldBranches.size() + 1));
     std::set<std::string> oldProvides;
     
     for (auto br: oldBranches)

@@ -2,7 +2,7 @@
 
 // Загрузка спеков из api, или из git
 void PatchMaker::loadSpecs(specLoader sl) {
-    StatusBar status_load_specs("Загрузка spec файлов для патчей", 1.0 / float(packagesToPatch.size()));
+    StatusBar status_load_specs("Загрузка spec файлов для патчей", float(packagesToPatch.size()));
 	if (sl == specLoader::apiLoader) {
 		for (int i = 0; i < packagesToPatch.size(); i++) {
             // std::cout << "Loading spec for " << packagesToPatch[i] << std::endl;
@@ -76,7 +76,8 @@ std::string PatchMaker::generatePatch(std::string spec, std::vector<Dependency>&
 
 // Генерирует патчи для пакетов и сохраняет его по указанному пути
 void PatchMaker::makePatch(std::string patch_destination) {
-    StatusBar status_gener_patch("Генерация патчей", 1.0 / float(packagesToPatch.size()));
+    Aux::exec((std::string("mkdir -p ") + patch_destination).c_str());
+    StatusBar status_gener_patch("Генерация патчей", float(packagesToPatch.size()));
 
 	for (int i = 0; i < packagesToPatch.size(); i++) {
         // std::cout << "Patching package " + packagesToPatch[i] << "\n";

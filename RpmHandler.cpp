@@ -34,7 +34,7 @@ std::map<std::string, std::pair<std::string, std::string>> RpmHandler::getAllPac
     std::string src_name = "%{SOURCERPM}";
     std::string release = "%{RELEASE}";
     std::string version = "%{VERSION}";
-    StatusBar status_get_pack("Получение списка пакетов для анализа", 1.0 / float(classicArches.size()));
+    StatusBar status_get_pack("Получение списка пакетов для анализа", float(classicArches.size()));
     // зашрузка classic файлов для branch если файлы отсутствуют
     for (auto arch: classicArches)
     {
@@ -291,10 +291,10 @@ void RpmHandler::downloadClassicFile(std::string branch, std::string arch, std::
         res = curl_easy_perform(curl);
 
         if (res != CURLE_OK) {
-            std::cerr << "Ошибка при загрузке файла: " << curl_easy_strerror(res) << std::endl;
+            std::cerr << std::endl << "Ошибка при загрузке файла: " << curl_easy_strerror(res) << std::endl;
         }
         else {
-            std::cout << "Файл успешно загружен как " << archiveFile << std::endl;
+            //std::cout << "Файл успешно загружен как " << archiveFile << std::endl;
         }
 
         // Закрытие файла и освобождение ресурсов
@@ -305,7 +305,7 @@ void RpmHandler::downloadClassicFile(std::string branch, std::string arch, std::
     // Освобождение ресурсов libcurl
     curl_global_cleanup();
 
-    auto resp = system((std::string("xz -d ") + "./" + "pkglist.classic.xz").c_str());
+    auto resp = system((std::string("xz -dqq ") + "./" + "pkglist.classic.xz").c_str());
 
     if (resp != 0) {
         url = "http://ftp.altlinux.org/pub/distributions/ALTLinux/" + branch + "/branch/" + arch + "/base/pkglist.classic.xz";
@@ -324,10 +324,11 @@ void RpmHandler::downloadClassicFile(std::string branch, std::string arch, std::
             res = curl_easy_perform(curl);
 
             if (res != CURLE_OK) {
-                std::cerr << "Ошибка при загрузке файла: " << curl_easy_strerror(res) << std::endl;
+                std::cerr << std::endl << "Ошибка при загрузке файла: " << curl_easy_strerror(res) << std::endl;
             }
             else {
-                std::cout << "Файл успешно загружен как " << archiveFile << std::endl;
+                //std::cout << "Файл успешно загружен как " << archiveFile << std::endl;
+
             }
 
             // Закрытие файла и освобождение ресурсов
@@ -337,7 +338,7 @@ void RpmHandler::downloadClassicFile(std::string branch, std::string arch, std::
 
         // Освобождение ресурсов libcurl
         curl_global_cleanup();
-        system((std::string("xz -d ") + "./" + "pkglist.classic.xz").c_str());
+        auto resp = system((std::string("xz -dqq ") + "./" + "pkglist.classic.xz").c_str());
     }
 
     if (path == "") {

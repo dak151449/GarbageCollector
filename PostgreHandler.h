@@ -1,4 +1,3 @@
-#define CACHE_OFF
 #pragma once
 #include <iostream>
 #include <string>
@@ -6,10 +5,10 @@
 #include <unistd.h>
 #include <mutex>
 #include <json/json.h>
+#include <optional>
 #include <chrono>
 #include <vector>
 #include <pqxx/pqxx>
-// #include "Api.h"
 
 class PostgreHandler {
 public:
@@ -25,7 +24,5 @@ public:
     std::optional<bool> getDeprecated(std::string name);
 private:
     std::string table_name;
-    #ifndef CACHE_OFF
-    pqxx::connection connect;
-    #endif
+    std::optional<pqxx::connection> connect;
 };

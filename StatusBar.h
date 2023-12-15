@@ -14,7 +14,7 @@ public:
         if (!is_quiet)
             std::cout << info << "\n";
             
-        step = s;
+        step = 1.0 / s;
     };
 
     void print_status(std::string info = "");

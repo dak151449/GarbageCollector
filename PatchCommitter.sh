@@ -55,5 +55,5 @@ for package in *.patch; do
   git push git.alt sisyphus $version_release
   ssh build.alt task add $1 repo $package $version_release
   popd || { echo "Error: failed to popd"; exit 1; }
-  echo rm -rf $package
+  rm -rf $package
 done

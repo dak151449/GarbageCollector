@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
     auto t = Api::getBranchPackageNames("sisyphus");
     set<std::string> test;
     int index = 0;
-    StatusBar get_user_pack("Отбор пакетов для анализа", 1.0 / float(t.size()));
+    StatusBar get_user_pack("Отбор пакетов для анализа", float(t.size()));
     get_user_pack.print_status();
     for (auto it = t.begin(); it != t.end(); it++) {
         get_user_pack.print_status(*it);

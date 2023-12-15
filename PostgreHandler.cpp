@@ -1,33 +1,31 @@
-#define CACHE_OFF
 #include "PostgreHandler.h"
 
 extern std::string postgreConnStr;
 
-#ifdef CACHE_OFF
-PostgreHandler::PostgreHandler() {}
-void PostgreHandler::reconnect() {}
-bool PostgreHandler::addDeprecated(std::string name, bool data) { return true; }
-std::optional<bool> PostgreHandler::getDeprecated(std::string name) { return std::nullopt; }
-#elif
-PostgreHandler::PostgreHandler(): connect(pqxx::connection(postgreConnStr)) {
-    #ifdef CACHE_OFF
-    return;
-    #endif
+PostgreHandler::PostgreHandler() {
+    try {
+        connect = pqxx::connection(postgreConnStr);
+    }
+    catch (std::exception const &e){
+        std::cout << "Failed to connect PostgreSQL cacher: " << e.what() << "\n";
+        connect = std::nullopt;
+        return;
+    }
+
     table_name = "packages_what_dep_src_TEST";
-    pqxx::work W(connect);
+    pqxx::work W(connect.value());
     W.exec("CREATE TABLE IF NOT EXISTS " + table_name + " (name TEXT PRIMARY KEY, \"what_src\" boolean)");
     W.commit();
 }
 
 void PostgreHandler::reconnect() {
-    #ifdef CACHE_OFF
-    return;
-    #endif
+    if (!connect.has_value())
+        return;
     std::cerr << "Connection lost, trying to reconnect..." << std::endl;
     int times = 0;
     try {
         times++;
-        if(!connect.is_open()) {
+        if(!connect.value().is_open()) {
             connect = pqxx::connection(postgreConnStr);
         }
         times = 0;
@@ -43,8 +41,10 @@ void PostgreHandler::reconnect() {
 
 
 bool PostgreHandler::addDeprecated(std::string name, bool data) {
+    if (!connect.has_value())
+        return true;
     // getDeprecated(name, col, data);
-    pqxx::work W(connect);
+    pqxx::work W(connect.value());
     auto res = W.exec("SELECT *  FROM " + table_name + " WHERE name = '" + name + "'");
     if (res.begin() == res.end())
         auto res = W.exec_params("INSERT INTO " + table_name + " VALUES ($1, $2)", name, data);
@@ -55,7 +55,9 @@ bool PostgreHandler::addDeprecated(std::string name, bool data) {
 
 
 std::optional<bool> PostgreHandler::getDeprecated(std::string name) {
-    pqxx::work W(connect);
+    if (!connect.has_value())
+        return std::nullopt;
+    pqxx::work W(connect.value());
     pqxx::result R (W.exec("SELECT what_src FROM " + table_name + " WHERE name = '" + name + "'"));
     W.commit();
 
@@ -70,4 +72,3 @@ std::optional<bool> PostgreHandler::getDeprecated(std::string name) {
     
     return std::nullopt;
 }
-#endif
