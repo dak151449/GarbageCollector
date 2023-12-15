@@ -17,7 +17,7 @@ Api::response Api::getReadBuffer(std::string req) {
     if (curl) {
         //std::cout << req << "\n";
         curl_easy_setopt(curl, CURLOPT_URL, req.c_str());
-        //таймаут для запроса (иначе треш)
+        //таймаут для запроса (иначе трэш)
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, 305);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
@@ -75,8 +75,8 @@ std::set<std::string> Api::getBranchPackageNames(std::string branch) {
 std::vector<Aux::checked_package> Api::checkPackage(std::vector<std::string> pnames, std::string branch, Cacher& ch) {
     std::vector<Aux::checked_package> out;
 
-    // ------------------------ Кеширование TODO
-    std::vector<std::string> not_cache_pnames; // собираем список пакетов, которых нет в кеше
+    // ------------------------ Кэширование TODO
+    std::vector<std::string> not_cache_pnames; // собираем список пакетов, которых нет в кэше
 
     std::cout << "Api start " << pnames.size() <<"\n";
 

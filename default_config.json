@@ -1,0 +1,11 @@
+{
+    "user": "your_username",
+    "password": "your_password",
+    "host": "your_host",
+    "port": 5432,
+    "dbname": "your_dbname",
+    "target_session_attrs": "read-write",
+    "pack_regexs": [""],
+    "patch_destination": "./Patches/",
+    "is_quiet": false
+}

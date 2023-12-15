@@ -4,7 +4,12 @@ Config::Config(std::string file)
 {
     std::ifstream F(file, std::ifstream::binary);
     F >> conf;
-
+    if (!validate()) {
+        std::cout << "WARNING! config file is incorrect, the default config is used" << std::endl;
+        std::ifstream F_def(default_conf_name, std::ifstream::binary);
+        conf.clear();
+        F_def >> conf;
+    }
 }
 
 std::string Config::getConnectDB()
@@ -56,4 +61,27 @@ std::string Config::getDBName()
 std::string Config::getDBSession()
 {
     return conf["target_session_attrs"].asString();
+}
+
+std::string Config::getPatchDestination()
+{
+    return conf["patch_destination"].asString();
+}
+
+bool Config::getIsQuiet()
+{
+return conf["is_quiet"].asBool();
+}
+
+bool Config::validate() {
+
+    if (getDBUser() == "" || 
+        getDBPassword() == "" || 
+        getDBHost() == "" ||
+        getDBPort() == "" ||
+        getDBName() == "" ||
+        getDBSession() == "") {
+        return false;
+    }
+    return true;
 }

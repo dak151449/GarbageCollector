@@ -19,7 +19,12 @@ std::map<std::string,std::vector<Dependency>> LegacyDependencyAnalyzer::criteria
     std::map<std::string,std::vector<Dependency>> oldDepInPacks; // мапа стаарых зависимостей в пакете
 
     std::set<std::string> fix;
+
+    StatusBar status_dep_pack("Анализ зависимостей в пакетах", float(packDependencies.size()));
+    status_dep_pack.print_status();
     for (auto pack: packDependencies) {
+        status_dep_pack.print_status(pack.packageName);
+
         oldDepInPacks[pack.packageName] = {};
 
         std::vector<std::string> dependencyPacksNames = {};
@@ -30,7 +35,7 @@ std::map<std::string,std::vector<Dependency>> LegacyDependencyAnalyzer::criteria
         std::map<std::string, bool> checkOldDeps; //  проверка на то что пакет есть в oldPackNames
         for (auto oldDep: dependencyPacksNames) { // oldDepProvides
             if (Aux::is_virtual(oldDep)) {
-                // если виртуальный пакет был кем-то провайден в старых репозиториях и отсутствует в актуальном
+                // если виртуальный пакет был кем-то provides в старых репозиториях и отсутствует в актуальном
                 checkOldDeps[oldDep] = oldDepProvides.count(oldDep);
             } else {
                 // те пакет есть в старых репозиториях и отсутствует в актуальном
@@ -42,19 +47,20 @@ std::map<std::string,std::vector<Dependency>> LegacyDependencyAnalyzer::criteria
         std::transform(lb.begin(), lb.end(), lb.begin(), ::tolower);
         auto depSrc = isAnythingDependsSrc(dependencyPacksNames, lb, ch);
 
-        std::cout <<  pack.dependencies.size() << std::endl;
+        // std::cout <<  pack.dependencies.size() << std::endl;
         for (auto oldPack: pack.dependencies) {
             bool checkOld = checkOldDeps[oldPack.dependencyName]; // true если старый, иначе false
             bool checkDepSrc = depSrc[oldPack.dependencyName]; // true если есть зависимость, иначе false
 
-            std::cout << oldPack.dependencyName << " " << oldPack.type << " " << "Is old? " << checkOld << " Is depend..? " << checkDepSrc << std::endl; 
+            // std::cout << oldPack.dependencyName << " " << oldPack.type << " " << "Is old? " << checkOld << " Is depend..? " << checkDepSrc << std::endl; 
             if (checkOld && !checkDepSrc) {
                 oldDepInPacks[pack.packageName].push_back(oldPack);
-                std::cout << pack.packageName << " delete => " << oldPack.dependencyName << " " << oldPack.type << std::endl;
+                // std::cout << pack.packageName << " delete => " << oldPack.dependencyName << " " << oldPack.type << std::endl;
                 fix.insert(pack.packageName);
             }
         }
     }
+    status_dep_pack.end_status();
     // pakagesToFix = std::vector<std::string>(fix.begin(), fix.end());
     packagesToFix.resize(fix.size());
     std::copy(fix.begin(), fix.end(), packagesToFix.begin());
@@ -64,13 +70,16 @@ std::map<std::string,std::vector<Dependency>> LegacyDependencyAnalyzer::criteria
 std::set<std::string> LegacyDependencyAnalyzer::getOldPackagesNames()
 {   
     std::set<std::string> oldPackages;
+    StatusBar downloading_classic_files_status("Загрузка classic файлов", float(oldBranches.size() * classicArches.size()));
     for (auto br: oldBranches)
     {
         for(auto arch: classicArches) {
+            downloading_classic_files_status.print_status(br + "-" + arch);
             auto getPack = RpmHandler::getPackageFromClassicFileName(folderClassicFiles, br, constNameClassic, arch);
             oldPackages.insert(getPack.begin(), getPack.end());
         }
     }
+    downloading_classic_files_status.end_status();
 
     for (auto name: packagesToAnalyse) {
         oldPackages.erase(name.first);
@@ -82,23 +91,29 @@ std::set<std::string> LegacyDependencyAnalyzer::getOldPackagesNames()
 
 std::set<std::string> LegacyDependencyAnalyzer::getOldProvides()
 {   
+    auto dep =  RpmHandler::getDependenciesForPackages(packagesToAnalyse);
+    StatusBar status_get_old_provides("Поиск provides, которые есть в старых ветках", float(oldBranches.size() + 1));
     std::set<std::string> oldProvides;
+    
     for (auto br: oldBranches)
-    {
+    {   
+        status_get_old_provides.print_status("Анализ " + br);
         for(auto arch: classicArches) {
             auto getPack = RpmHandler::getAllProvides(folderClassicFiles, br, constNameClassic, arch);
             oldProvides.insert(getPack.begin(), getPack.end());
         }
     }
-
-    auto dep =  RpmHandler::getDependenciesForPackages(packagesToAnalyse);
+   
+    status_get_old_provides.print_status("Анализ текущей ветки"); 
+   
     for (auto pack: dep) {
-        for (auto dep: pack.dependencies) {
-            if (dep.type == "provides")
-                oldProvides.erase(dep.dependencyName);
+        // status_get_old_provides.print_status("Анализ provides в пакете" + pack.packageName);
+        for (auto depp: pack.dependencies) {
+            if (depp.type == "provides")
+                oldProvides.erase(depp.dependencyName);
         }
     }
-
+    status_get_old_provides.end_status();
     oldDepProvides = oldProvides;
     return oldProvides;
 }

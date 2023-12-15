@@ -1,5 +1,9 @@
 #include "WDS.h"
 
+std::map<std::string, std::set<std::string>> wds::actual_provides;
+std::map<std::string, std::set<std::string>> wds::virtual_parents;
+std::set<std::string> wds::old_provides;
+
 std::vector<Aux::checked_package> wds::has_active_dependencies(std::vector<std::string> packagesNames, Cacher& ch) {
     std::vector<Aux::checked_package> out;
     for (auto packNames: packagesNames) {
