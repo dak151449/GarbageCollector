@@ -51,7 +51,19 @@ target_link_libraries(GarbageCollector ${CURL_LIBRARIES} )
 target_link_libraries(GarbageCollector -lpqxx -lrpm -lrpmio -lhtmlcxx)
 
 add_custom_command(
-TARGET GarbageCollector POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/default_config.json
-        ${CMAKE_CURRENT_BINARY_DIR}/default_config.json)
+    TARGET GarbageCollector POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/default_config.json
+            ${CMAKE_CURRENT_BINARY_DIR}/default_config.json)
+
+add_custom_command(
+    TARGET GarbageCollector POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/run.sh
+            ${CMAKE_CURRENT_BINARY_DIR}/run.sh)
+
+add_custom_command(
+    TARGET GarbageCollector POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/PatchCommitter.sh
+            ${CMAKE_CURRENT_BINARY_DIR}/PatchCommitter.sh)

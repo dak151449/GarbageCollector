@@ -3,6 +3,7 @@
 patch_commiter='PatchCommitter.sh'
 tar_name='patches.tar.gz'
 config='config.json'
+default_config='default_config.json'
 
 patch_destination=$(grep -o '"patch_destination": "[^"]*' $config | grep -o '[^"]*$')
 
@@ -60,6 +61,10 @@ function help {
    echo
 }
 
+
+if [ ! -f $config ]; then
+    cp $default_config $config
+fi
 rm -rf $patch_destination
 mkdir $patch_destination
 set_verbose
