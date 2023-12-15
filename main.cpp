@@ -15,7 +15,7 @@
 using namespace std;
 using namespace htmlcxx;
 
-// А точно безоавсно хранить админский ключ в строке на гите, и так сойдет ...
+// Запрос подключения к БД
 std::string postgreConnStr = "";
 //Прокся
 //std::string apiURL = "http://64.226.73.174:8080";

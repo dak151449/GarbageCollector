@@ -43,10 +43,9 @@ public:
 
     static std::set<std::string> get_package_provides(std::string package_name);
 private:
-    static inline std::map<std::string, std::set<std::string>> actual_provides;
-    static inline std::map<std::string, std::set<std::string>> virtual_parents;
-    static inline std::set<std::string> old_provides;
-    // static inline std::set<std::string> virtual_packages;
+    static std::map<std::string, std::set<std::string>> actual_provides;
+    static std::map<std::string, std::set<std::string>> virtual_parents;
+    static std::set<std::string> old_provides;
 
     static bool _has_active_dependencies(std::string package_name,
                                          Cacher& ch, std::set<std::string>& was);
