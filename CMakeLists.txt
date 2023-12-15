@@ -49,3 +49,9 @@ message("JSONLIB:" ${JSONCPP_LIBRARIES})
 include_directories(${CURL_INCLUDE_DIR})
 target_link_libraries(GarbageCollector ${CURL_LIBRARIES} )
 target_link_libraries(GarbageCollector -lpqxx -lrpm -lrpmio -lhtmlcxx)
+
+add_custom_command(
+TARGET GarbageCollector POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/default_config.json
+        ${CMAKE_CURRENT_BINARY_DIR}/default_config.json)
