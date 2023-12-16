@@ -2,11 +2,29 @@
 
 Config::Config(std::string file)
 {
-    std::ifstream F(file, std::ifstream::binary);
-    F >> conf;
-    if (!validate()) {
+    homedir = getenv("HOME");
+    if ( homedir == NULL ) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+    std::cout << homedir << std::endl;
+    if (homedir != NULL)
+        homedir = (std::string(homedir) + "/GarbageCollector/").c_str();
+
+    try {
+        std::cout << "home " << homedir + file << "\n";
+        std::ifstream F(homedir + file, std::ifstream::binary);
+        F >> conf;
+        if (!validate()) {
+            std::cout << "WARNING! config file is incorrect, the default config is used" << std::endl;
+            std::ifstream F_def(default_conf_name, std::ifstream::binary);
+            conf.clear();
+            F_def >> conf;
+        }
+    }
+    catch(std::exception e){
+        std::cout << "etc " << etcdir + default_conf_name << "\n";
         std::cout << "WARNING! config file is incorrect, the default config is used" << std::endl;
-        std::ifstream F_def(default_conf_name, std::ifstream::binary);
+        std::ifstream F_def(etcdir + default_conf_name, std::ifstream::binary);
         conf.clear();
         F_def >> conf;
     }

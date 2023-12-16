@@ -3,10 +3,16 @@
 #include <json/json.h>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 class Config
 {
 private:
+    const char *homedir;
+    const char *etcdir = "etc/GarbageCollector/";
+
     Json::Value conf;
     std::string getDBUser();
     std::string getDBPassword();

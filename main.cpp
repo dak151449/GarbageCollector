@@ -132,7 +132,7 @@ vector<string> get_list_errors() {
     return list_errors;
 }
 
-// Исключать пакеты из списка не собираемых пакетов
+// Исключать пакеты из списка несобираемых пакетов
 bool ignore_error_pkgs = true;
 
 // Обработчик флагов запуска

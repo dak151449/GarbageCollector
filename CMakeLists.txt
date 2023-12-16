@@ -67,3 +67,13 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_SOURCE_DIR}/PatchCommitter.sh
             ${CMAKE_CURRENT_BINARY_DIR}/PatchCommitter.sh)
+
+install(TARGETS GarbageCollector DESTINATION bin)
+
+install(FILES ${CMAKE_SOURCE_DIR}/default_config.json {CMAKE_SOURCE_DIR}/Patch 
+        DESTINATION /etc/GarbageCollector
+        PERMISSIONS OWNER_WRITE OWNER_READ)
+
+install(FILES ${CMAKE_SOURCE_DIR}/config.json
+        DESTINATION ${HOME}/GarbageCollector
+        PERMISSIONS OWNER_WRITE OWNER_READ)
