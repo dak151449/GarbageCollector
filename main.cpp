@@ -157,6 +157,8 @@ bool process_flags(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     if (!process_flags(argc, argv))
         return 0;
+
+    Aux::exec("mkdir -p /tmp/GarbageCollector/");
     
     Config conf;
     StatusBar::is_quiet = conf.getIsQuiet();

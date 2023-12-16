@@ -56,7 +56,7 @@ public:
     std::map<std::string, std::pair<std::string, std::string>> static getAllPackagesName(std::string branch, std::set<std::string> packNames);
 
     // возвращает набор зависимостей для списка пакетов
-    std::vector<PackageDependencies> static getDependenciesForPackages(std::map<std::string, std::pair<std::string, std::string>> packageList);
+    std::vector<PackageDependencies> static getDependenciesForPackages(std::string branch, std::map<std::string, std::pair<std::string, std::string>> packageList);
 
     // возвращает множество пакетов по названию классик файла
     std::set<std::string> static getPackageFromClassicFileName(std::string folder, std::string branch, 
@@ -66,7 +66,7 @@ public:
     std::set<std::string> static getAllProvides(std::string folder, std::string branch, 
                                                    std::string classicName, std::string arch);
 
-    std::map<std::string, std::set<std::string>> static packagesProvides();
+    std::map<std::string, std::set<std::string>> static packagesProvides(std::string branch);
 private:
     // возвращает файловый дескриптор
     FD_t static getCalssicFileDescriptor(std::string fileName);

@@ -5,16 +5,16 @@ void LegacyDependencyAnalyzer::analysingBranchPackages(std::set<std::string> pac
     packagesToAnalyse = RpmHandler::getAllPackagesName(branch, packNames);
 }
 
-std::vector<PackageDependencies> LegacyDependencyAnalyzer::getAllDependencies()
+std::vector<PackageDependencies> LegacyDependencyAnalyzer::getAllDependencies(std::string branch)
 {   
-    return RpmHandler::getDependenciesForPackages(packagesToAnalyse);
+    return RpmHandler::getDependenciesForPackages(branch, packagesToAnalyse);
 }
 
 std::map<std::string,std::vector<Dependency>> LegacyDependencyAnalyzer::criteriaChecking(Cacher& ch, std::string branch)
 {
     std::set<std::string> oldPackNames = getOldPackagesNames();
-    getOldProvides();
-    auto packDependencies = RpmHandler::getDependenciesForPackages(packagesToAnalyse);
+    getOldProvides(branch);
+    auto packDependencies = RpmHandler::getDependenciesForPackages(branch, packagesToAnalyse);
 
     std::map<std::string,std::vector<Dependency>> oldDepInPacks; // мапа стаарых зависимостей в пакете
 
@@ -89,9 +89,9 @@ std::set<std::string> LegacyDependencyAnalyzer::getOldPackagesNames()
     return oldPackages;
 }
 
-std::set<std::string> LegacyDependencyAnalyzer::getOldProvides()
+std::set<std::string> LegacyDependencyAnalyzer::getOldProvides(std::string branch)
 {   
-    auto dep =  RpmHandler::getDependenciesForPackages(packagesToAnalyse);
+    auto dep =  RpmHandler::getDependenciesForPackages(branch, packagesToAnalyse);
     StatusBar status_get_old_provides("Поиск provides, которые есть в старых ветках", float(oldBranches.size() + 1));
     std::set<std::string> oldProvides;
     
