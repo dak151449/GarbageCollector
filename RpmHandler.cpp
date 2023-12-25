@@ -38,10 +38,10 @@ std::map<std::string, std::pair<std::string, std::string>> RpmHandler::getAllPac
     // зашрузка classic файлов для branch если файлы отсутствуют
     for (auto arch: classicArches)
     {
-        FD_t Fd = getCalssicFileDescriptor(constNameClassic + arch);
+        FD_t Fd = getCalssicFileDescriptor("/tmp/GarbageCollector/" + branch + "/" + constNameClassic + arch);
         if (Ferror(Fd)) {
             // загрузить новый pkglist для branch
-            downloadClassicFile(branch, arch);
+            downloadClassicFile(branch, arch, "/tmp/GarbageCollector");
         }
         Fclose(Fd);
     }
@@ -49,7 +49,7 @@ std::map<std::string, std::pair<std::string, std::string>> RpmHandler::getAllPac
 
     for (auto arch: classicArches) {
         status_get_pack.print_status("Анализ " + arch);
-        std::string pkglist = constNameClassic + arch;
+        std::string pkglist = "/tmp/GarbageCollector/" + branch + "/" + constNameClassic + arch;
         
         FD_t Fd = getCalssicFileDescriptor(pkglist);
         if (Ferror(Fd)) {
@@ -91,7 +91,7 @@ std::map<std::string, std::pair<std::string, std::string>> RpmHandler::getAllPac
     return srcNameToPackName;
 }
 
-std::vector<PackageDependencies> RpmHandler::getDependenciesForPackages(std::map<std::string, std::pair<std::string, std::string>> packageList)
+std::vector<PackageDependencies> RpmHandler::getDependenciesForPackages(std::string branch, std::map<std::string, std::pair<std::string, std::string>> packageList)
 {   
     // словарь [имя пакета, структура PackageDependencies те его зависимости в спек файле]
     std::map<std::string, PackageDependencies> packagesDependencies;
@@ -111,7 +111,7 @@ std::vector<PackageDependencies> RpmHandler::getDependenciesForPackages(std::map
         std::string name =  "%{SOURCERPM}";
         std::vector<char*> pkglists = {"pkglist.classic.x86_64", "pkglist.classic.noarch"};
         for (auto arch: classicArches) {
-            auto pkglist = constNameClassic + arch;
+            auto pkglist = "/tmp/GarbageCollector/" + branch + "/" + constNameClassic + arch;
             FD_t Fd = getCalssicFileDescriptor(pkglist);
             if (Ferror(Fd)) {
                 fprintf(stderr, "%s: %s: %s\n", progname, pkglist, Fstrerror(Fd));
@@ -213,8 +213,8 @@ std::set<std::string> RpmHandler::getPackageFromClassicFileName(std::string fold
 
 
 FD_t RpmHandler::getCalssicFileDescriptor(std::string fileName)
-{   
-    FD_t Fd = Fopen(("./" + fileName).c_str(), "r.ufdio");
+{
+    FD_t Fd = Fopen((fileName).c_str(), "r.ufdio");
     return Fd;
 }
 
@@ -345,7 +345,7 @@ void RpmHandler::downloadClassicFile(std::string branch, std::string arch, std::
         resp = system((std::string("mv ./pkglist.classic ") + "pkglist.classic."+arch).c_str());
     } else {
         resp = system(("mkdir -p " + path + "/" + branch).c_str());
-        resp = system((std::string("mv ./pkglist.classic ") + "./" + path + "/" + branch + "/pkglist.classic." + arch).c_str());
+        resp = system((std::string("mv ./pkglist.classic ") + path + "/" + branch + "/pkglist.classic." + arch).c_str());
     }
     
 }
@@ -395,7 +395,7 @@ std::set<std::string> RpmHandler::getAllProvides(std::string folder, std::string
     return out;
 }
 
-std::map<std::string, std::set<std::string>> RpmHandler::packagesProvides()
+std::map<std::string, std::set<std::string>> RpmHandler::packagesProvides(std::string branch)
 {   
     // словарь [имя пакета, структура PackageDependencies те его зависимости в спек файле]
     std::map<std::string, std::set<std::string>> packagesDependencies;
@@ -408,7 +408,7 @@ std::map<std::string, std::set<std::string>> RpmHandler::packagesProvides()
         std::string name =  "%{NAME}";
         std::vector<char*> pkglists = {"pkglist.classic.x86_64", "pkglist.classic.noarch"};
         for (auto arch: classicArches) {
-            auto pkglist = constNameClassic + arch;
+            auto pkglist = "/tmp/GarbageCollector/" + branch + "/" + constNameClassic + arch;
             FD_t Fd = getCalssicFileDescriptor(pkglist);
             if (Ferror(Fd)) {
                 fprintf(stderr, "%s: %s: %s\n", progname, pkglist, Fstrerror(Fd));

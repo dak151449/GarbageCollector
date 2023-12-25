@@ -6,6 +6,6 @@
     "dbname": "your_dbname",
     "target_session_attrs": "read-write",
     "pack_regexs": [""],
-    "patch_destination": "./Patches/",
+    "patch_destination": "/tmp/GarbageCollector/Patches/",
     "is_quiet": false
 }

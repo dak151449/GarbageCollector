@@ -132,7 +132,7 @@ vector<string> get_list_errors() {
     return list_errors;
 }
 
-// Исключать пакеты из списка не собираемых пакетов
+// Исключать пакеты из списка несобираемых пакетов
 bool ignore_error_pkgs = true;
 
 // Обработчик флагов запуска
@@ -157,6 +157,8 @@ bool process_flags(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
     if (!process_flags(argc, argv))
         return 0;
+
+    Aux::exec("mkdir -p /tmp/GarbageCollector/");
     
     Config conf;
     StatusBar::is_quiet = conf.getIsQuiet();

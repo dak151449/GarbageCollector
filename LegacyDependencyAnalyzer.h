@@ -21,7 +21,7 @@ class LegacyDependencyAnalyzer {
         std::vector<std::string> oldBranches = {"4.0", "4.1", "p5", "p6", "p7", "p8"};
 
         // статичная часть названия классик файла pkglist.classic(архитектура x86_64)  
-        const std::string folderClassicFiles = "oldBranches";
+        const std::string folderClassicFiles = "/tmp/GarbageCollector/oldBranches";
         std::string constNameClassic = "pkglist.classic."; 
         std::vector<std::string> classicArches = {"x86_64", "noarch"};
 
@@ -37,13 +37,13 @@ class LegacyDependencyAnalyzer {
         void analysingBranchPackages(std::set<std::string> packNames, std::string branch = "Sisyphus");
 
         // возвращает список всех зависимостей для packagesToAnalyse
-        std::vector<PackageDependencies> getAllDependencies();
+        std::vector<PackageDependencies> getAllDependencies(std::string branch = "Sisyphus");
 
         // проверяет зависимости из unicDependecies на критерии (присутствие в старых репозиториях и неиспользуемость в актульном)
         std::map<std::string,std::vector<Dependency>> criteriaChecking(Cacher& ch, std::string branch = "Sisyphus");
     
         // возвращает все provides, которые есть в oldBranches и отсутствуют в проверяемой ветке
-        std::set<std::string> getOldProvides();
+        std::set<std::string> getOldProvides(std::string branch);
     private:
         // список уникальных зависимостей генерируемых методом getAllDependencies
         std::set<Dependency> unicDependecies;

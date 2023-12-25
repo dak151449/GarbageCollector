@@ -13,7 +13,7 @@
 
 class wds {
 public:
-    static void init(std::string folderClassicFiles, std::vector<std::string> oldBranches, std::string constNameClassic, std::vector<std::string> classicArches) {
+    static void init(std::string branch, std::string folderClassicFiles, std::vector<std::string> oldBranches, std::string constNameClassic, std::vector<std::string> classicArches) {
         // for (auto br: oldBranches)
         // {
         //     for(auto arch: classicArches) {
@@ -28,7 +28,7 @@ public:
         //     }
         // }
 
-        actual_provides = RpmHandler::packagesProvides();
+        actual_provides = RpmHandler::packagesProvides(branch);
 
         for (auto pack: actual_provides) {
             for(auto pack_p: pack.second) {
